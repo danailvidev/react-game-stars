@@ -23,7 +23,7 @@ const Stars = (props) => {
         button = <button className="btn btn-danger"><i className="fa fa-times"></i></button>
       break;
       default:
-        button = <button className="btn" onClick={() => props.checkAnswer()} disabled={props.selectedNumbers.length === 0}>=</button>
+        button = <button className="btn" onClick={() => {props.checkAnswer(); props.startTimer()}} disabled={props.selectedNumbers.length === 0}>=</button>
       break;
     };
 
@@ -78,6 +78,12 @@ const Stars = (props) => {
       </div>
     )
   }
+
+  const Timer = (props) => {
+    return (
+      <div className="text-center">Time Left: {props.timeLeft}</div>
+    )
+  }
   
   class Game extends Component {
     static randomNumber = () => Math.floor(Math.random()*9) + 1;
@@ -87,7 +93,8 @@ const Stars = (props) => {
       answerIsCorrect: null,
       usedNumbers: [],
       redraws: 5,
-      doneStatus: null
+      doneStatus: null,
+      timeLeft: 10
     });
     state = Game.initialState();
 
@@ -112,6 +119,9 @@ const Stars = (props) => {
       this.setState(prevState => ({
         answerIsCorrect: prevState.randomNumberOfStars === prevState.selectedNumbers.reduce((acc, n) => acc + n, 0)
       }))
+      if (this.state.timeLeft === 60) {
+        // this.startTimer()
+      }
     };
 
     acceptAnswer = () => {
@@ -171,8 +181,21 @@ const Stars = (props) => {
 
     resetGame = () => this.setState(Game.initialState());
 
+    startTimer = () => {
+      this.setState({interval: setInterval( this.tick, 1000 )})
+    };
+
+    tick = () => {
+      const { timeLeft } = this.state
+      if (timeLeft === 0 ) {
+        this.setState({doneStatus: 'Time Left ;(' })
+      } else {
+        this.setState({timeLeft:  timeLeft - 1 })
+      }
+    }
+
     render() {
-      const { selectedNumbers, randomNumberOfStars, answerIsCorrect, usedNumbers, redraws, doneStatus} = this.state;
+      const { selectedNumbers, randomNumberOfStars, answerIsCorrect, usedNumbers, redraws, doneStatus, timeLeft} = this.state;
       return (
           <div  className="container">
             <h3>Play Nine</h3>
@@ -186,15 +209,16 @@ const Stars = (props) => {
                 acceptAnswer={this.acceptAnswer}
                 redraw={this.redraw}
                 redraws={redraws}
+                startTimer={this.startTimer}
               />
               <Answer selectedNumbers={selectedNumbers} unselectNumber={this.unselectNumber} />
             </div>
             <br />
             { doneStatus 
             ? <DoneFrame doneStatus={doneStatus} resetGame={this.resetGame}/> 
-            : <Numbers selectedNumbers={selectedNumbers} selectNumber={this.selectNumber} usedNumbers={usedNumbers} />
+            : <Numbers selectedNumbers={selectedNumbers} selectNumber={this.selectNumber} usedNumbers={usedNumbers}/>
             }
-            
+            <Timer timeLeft={timeLeft}/>
           </div>
         )
       }
