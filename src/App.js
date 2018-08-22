@@ -94,7 +94,7 @@ const Stars = (props) => {
       usedNumbers: [],
       redraws: 5,
       doneStatus: null,
-      timeLeft: 10
+      timeLeft: 60
     });
     state = Game.initialState();
 
@@ -119,9 +119,6 @@ const Stars = (props) => {
       this.setState(prevState => ({
         answerIsCorrect: prevState.randomNumberOfStars === prevState.selectedNumbers.reduce((acc, n) => acc + n, 0)
       }))
-      if (this.state.timeLeft === 60) {
-        // this.startTimer()
-      }
     };
 
     acceptAnswer = () => {
